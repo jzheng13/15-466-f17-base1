@@ -346,8 +346,8 @@ int main(int argc, char **argv) {
         std::make_pair(4, 5) };
     int rock_mined[ROCKS] = { 0 };
 
-    float money_u = ((rock_loc[money_tile].first + 0.5f) / 5) * 1.0f;
-    float money_v = ((rock_loc[money_tile].second + 0.5f) / 7) * 1.0f;
+    float money_u = (rock_loc[money_tile].first + 0.5f) / 5.0f;
+    float money_v = (rock_loc[money_tile].second + 0.5f) / 7.0f;
 
     //set player position at starting tile
     std::pair<int, int> man_xy = std::make_pair(2, 2);
@@ -482,9 +482,9 @@ int main(int argc, char **argv) {
             // always draw entire map
             draw_sprite(map, glm::vec2(0.0f, 0.0f));
             //  draw sprite player
-            float player_u = ((man_xy.first + 0.5f) / 5) * 1.0f;
-            float player_v = ((man_xy.second + 0.5f) / 7) * 1.0f;
-            draw_sprite(man, glm::vec2((man_xy.first / 5) * 1.0f, ((man_xy.second + 0.5f) / 7) * 1.0f));
+            float player_u = (man_xy.first + 0.5f) / 5.0f;
+            float player_v = (man_xy.second + 0.5f) / 7.0f;
+            draw_sprite(man, glm::vec2(player_u, player_v));
             // always draw money bag           
             draw_sprite(money_bag, glm::vec2(money_u, money_v));
 
@@ -492,8 +492,8 @@ int main(int argc, char **argv) {
             for (int i = 0; i < TILE_X; i++) {
                 for (int j = 0; j < TILE_Y; j++) {
                     if (!map_grid[i][j]) {
-                        int coord_u = ((i + 0.5f) / 5) * 1.0f;
-                        int coord_v = ((j + 0.5f) / 7) * 1.0f;
+                        int coord_u = (i + 0.5f) / 5.0f;
+                        int coord_v = (j + 0.5f) / 7.0f;
                         draw_sprite(black_tile, glm::vec2(coord_u, coord_v));
                     }
                 }
@@ -503,25 +503,25 @@ int main(int argc, char **argv) {
             for (int i = 0; i < ROCKS; i++) {
                 if (!rock_mined[i]
                     && map_grid[rock_loc[i].first][rock_loc[i].second]) {
-                    int coord_u = ((rock_loc[i].first + 0.5f) / 5) * 1.0f;
-                    int coord_v = ((rock_loc[i].second + 0.5f) / 7) * 1.0f;
+                    int coord_u = (rock_loc[i].first + 0.5f) / 5.0f;
+                    int coord_v = (rock_loc[i].second + 0.5f) / 7.0f;
                     draw_sprite(rock, glm::vec2(coord_u, coord_v));
                 }
             }
 
             // draw display text
             float display_text_x = 0.5f;
-            float display_text_y = (6.5 / 7) * 1.0f;
-            glm::vec2 display_tex_loc = glm::vec2(display_text_x, display_text_y);
+            float display_text_y = 6.5f / 7.0f;
+            glm::vec2 display_text_loc = glm::vec2(display_text_x, display_text_y);
             switch (display_text) {
             case 0:
-                draw_sprite(game_start, display_tex_loc);
+                draw_sprite(game_start, display_text_loc);
                 break;
             case 1:
-                draw_sprite(mine_with_space, display_tex_loc);
+                draw_sprite(mine_with_space, display_text_loc);
                 break;
             default:
-                draw_sprite(game_end, display_tex_loc);
+                draw_sprite(game_end, display_text_loc);
                 break;
         }
 
