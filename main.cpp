@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 	//Configuration:
 	struct {
 		std::string title = "Game1: Text/Tiles";
-		glm::uvec2 size = glm::uvec2(640, 480);
+        glm::uvec2 size = glm::uvec2(WINDOW_WIDTH, WINDOW_HEIGHT);
 	} config;
 
 	//------------  initialization ------------
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
 
 	{ //load texture 'tex':
 		std::vector< uint32_t > data;
-		if (!load_png("elements.png", &tex_size.x, &tex_size.y, &data, LowerLeftOrigin)) {
+		if (!load_png("spriteatlas.png", &tex_size.x, &tex_size.y, &data, LowerLeftOrigin)) {
 			std::cerr << "Failed to load texture." << std::endl;
 			exit(1);
 		}
