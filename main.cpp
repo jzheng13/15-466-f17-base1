@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <utility>
 #include <stdexcept>
 
 // macros
@@ -337,19 +338,19 @@ int main(int argc, char **argv) {
     bool found = false;
 
     //location of rocks, whether rock mined
-    pair<int, int> rock_loc[ROCKS] = {
-        make_pair(4, 0),
-        make_pair(0, 1),
-        make_pair(0, 2),
-        make_pair(2, 4),
-        make_pair(4, 5) };
+    std::pair<int, int> rock_loc[ROCKS] = {
+        std::make_pair(4, 0),
+        std::make_pair(0, 1),
+        std::make_pair(0, 2),
+        std::make_pair(2, 4),
+        std::make_pair(4, 5) };
     int rock_mined[ROCKS] = { 0 };
 
     float money_u = ((rock_loc[money_tile].first + 0.5f) / 5) * 1.0f;
     float money_v = ((rock_loc[money_tile].second + 0.5f) / 7) * 1.0f;
 
     //set player position at starting tile
-    pair<int><int> man_xy = make_pair(2, 2);
+    std::pair<int, int> man_xy = std::make_pair(2, 2);
 
     // set display text
     int display_text = 0;
