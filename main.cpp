@@ -9,6 +9,14 @@
 #include <iostream>
 #include <stdexcept>
 
+// macros
+#define TILE_SIZE 128
+#define TILE_X 5
+#define TILE_Y 6
+#define WINDOW_WIDTH (TILE_SIZE * 5)
+#define WINDOW_HEIGHT (TILE_SIZE * (TILE_Y + 1))
+#define ROCKS 5
+
 static GLuint compile_shader(GLenum type, std::string const &source);
 static GLuint link_program(GLuint vertex_shader, GLuint fragment_shader);
 
@@ -186,22 +194,169 @@ int main(int argc, char **argv) {
 
 	//------------ sprite info ------------
 	struct SpriteInfo {
-		glm::vec2 min_uv = glm::vec2(0.0f);
-		glm::vec2 max_uv = glm::vec2(1.0f);
-		glm::vec2 rad = glm::vec2(0.5f);
+		glm::vec2 min_uv;
+		glm::vec2 max_uv;
+		glm::vec2 rad;
 	};
 
+    /*
+    auto load_sprite = [](std::string const &name) -> SpriteInfo {
+        SpriteInfo info;
+        //TODO: look up sprite name in table of sprite infos
+        return info;
+    };
+    */
 
-	auto load_sprite = [](std::string const &name) -> SpriteInfo {
-		SpriteInfo info;
-		//TODO: look up sprite name in table of sprite infos
-		return info;
-	};
+    SpriteInfo player;
+    SpriteInfo map;
+    SpriteInfo black_tile;
+    SpriteInfo money_bag;
+    SpriteInfo rock;
+    SpriteInfo game_start;
+    SpriteInfo game_end;
+    SpriteInfo mine_with_space;
+    
+    //map
+    map.min_uv = glm::vec2(0.0f, 0.0f);
+    map.max_uv = glm::vec2(0.83333f, 0.88888f);
+    map.rad = glm::vec2(0.5f);
 
+    //black tile
+    black_tile.min_uv = glm::vec2(0.83333f, 0.0f);
+    black_tile.max_uv = glm::vec2(1.0f, 0.11111f);
+    black_tile.rad = glm::vec2(0.5f);
+
+    //rock
+    rock.min_uv = glm::vec2(0.83333f, 0.11111f);
+    rock.max_uv = glm::vec2(1.0f, 0.22222f);
+    rock.rad = glm::vec2(0.5f);
+
+    //money bag
+    money_bag.min_uv = glm::vec2(0.83333f, 0.22222f);
+    money_bag.max_uv = glm::vec2(1.0f, 0.33333f);
+    money_bag.rad = glm::vec2(0.5f);
+
+    //man
+    man.min_uv = glm::vec2(0.83333f, 0.33333f);
+    man.max_uv = glm::vec2(1.0f, 0.44444f);
+    man.rad = glm::vec2(0.5f);
+
+    //instructions
+    game_start.min_uv = glm::vec2(0.5f, 0.88888f);
+    game_start.max_uv = glm::vec2(1.0f, 0.99999f);
+    game_start.rad = glm::vec2(0.5f);
+
+    game_end.min_uv = glm::vec2(0.0f, 0.88888f);
+    game_end.max_uv = glm::vec2(0.5f, 0.99999f);
+    game_end.rad = glm::vec2(0.5f);
+
+    mine_with_space.min_uv = glm::vec2(0.0f, 0.99999f);
+    mine_with_space.max_uv = glm::vec2(0.5f, 1.0f);
+    mine_with_space.rad = glm::vec2(0.5f);
+
+    struct ValidDirections {
+        bool left = false, right = false, up = false, down = false;
+    };
+    
+    ValidDirections tile_dir[TILE_X][TILE_Y];
+
+    //tiles where going left is valid
+    tile_dir[1][0].left = tile_dir[2][0].left
+        = tile_dir[3][0].left
+        = tile_dir[3][1].left
+        = tile_dir[1][2].left
+        = tile_dir[2][2].left
+        = tile_dir[4][2].left
+        = tile_dir[2][3].left
+        = tile_dir[3][3].left
+        = tile_dir[4][3].left
+        = tile_dir[1][5].left
+        = tile_dir[2][5].left
+        = tile_dir[3][5].left
+        = tile_dir[4][5].left
+        = true;
+
+    //tiles where going right is valid
+    tile_dir[0][0].right = tile_dir[0][1].right
+        = tile_dir[2][0].right
+        = tile_dir[2][1].right
+        = tile_dir[0][2].right
+        = tile_dir[1][2].right
+        = tile_dir[3][2].right
+        = tile_dir[1][4].right
+        = tile_dir[2][4].right
+        = tile_dir[3][4].right
+        = tile_dir[0][5].right
+        = tile_dir[1][5].right
+        = tile_dir[2][5].right
+        = tile_dir[3][5].right
+        = true;
+
+    //tiles where going up is valid
+    tile_dir[1][1].up = tile_dir[2][1].up
+        = tile_dir[3][1].up
+        = tile_dir[4][1].up
+        = tile_dir[0][2].up
+        = tile_dir[2][2].up
+        = tile_dir[3][2].up
+        = tile_dir[4][2].up
+        = tile_dir[2][3].up
+        = tile_dir[1][4].up
+        = tile_dir[3][4].up
+        = tile_dir[4][4].up
+        = tile_dir[0][5].up
+        = tile_dir[1][5].up
+        = tile_dir[2][5].up
+        = tile_dir[3][5].up
+        = true;
+
+    //tiles where going down is valid
+    tile_dir[1][0].down = tile_dir[2][0].down
+        = tile_dir[3][0].down
+        = tile_dir[4][0].down
+        = tile_dir[0][1].down
+        = tile_dir[2][1].down
+        = tile_dir[3][1].down
+        = tile_dir[4][1].down
+        = tile_dir[2][2].down
+        = tile_dir[1][3].down
+        = tile_dir[3][3].down
+        = tile_dir[4][3].down
+        = tile_dir[0][4].down
+        = tile_dir[1][4].down
+        = tile_dir[2][4].down
+        = tile_dir[3][4].down
+        = true;
 
 	//------------ game state ------------
 
-	glm::vec2 mouse = glm::vec2(0.0f, 0.0f); //mouse position in [-1,1]x[-1,1] coordinates
+	//glm::vec2 mouse = glm::vec2(0.0f, 0.0f); //mouse position in [-1,1]x[-1,1] coordinates
+
+    //determine location of money bag
+    int money_tile = rand() % ROCKS;
+    bool found = false;
+
+    //location of rocks, whether rock mined
+    pair<int, int> rock_loc[ROCKS] = {
+        make_pair(4, 0),
+        make_pair(0, 1),
+        make_pair(0, 2),
+        make_pair(2, 4),
+        make_pair(4, 5) };
+    int rock_mined[ROCKS] = { 0 };
+
+    float money_u = ((rock_loc[money_tile].first + 0.5f) / 5) * 1.0f;
+    float money_v = ((rock_loc[money_tile].second + 0.5f) / 7) * 1.0f;
+
+    //set player position at starting tile
+    pair<int><int> man_xy = make_pair(2, 2);
+
+    // set display text
+    int display_text = 0;
+
+    // initialise map grid, unexplored tiles are 0
+    int map_grid[TILE_X][TILE_Y] = { 0 };
+    map_grid[2][2] = 1;  // player starting tile
 
 	struct {
 		glm::vec2 at = glm::vec2(0.0f, 0.0f);
@@ -213,31 +368,79 @@ int main(int argc, char **argv) {
 	//------------ game loop ------------
 
 	bool should_quit = false;
+
 	while (true) {
 		static SDL_Event evt;
-		while (SDL_PollEvent(&evt) == 1) {
-			//handle input:
-			if (evt.type == SDL_MOUSEMOTION) {
-				mouse.x = (evt.motion.x + 0.5f) / float(config.size.x) * 2.0f - 1.0f;
-				mouse.y = (evt.motion.y + 0.5f) / float(config.size.y) *-2.0f + 1.0f;
-			} else if (evt.type == SDL_MOUSEBUTTONDOWN) {
-			} else if (evt.type == SDL_KEYDOWN && evt.key.keysym.sym == SDLK_ESCAPE) {
-				should_quit = true;
-			} else if (evt.type == SDL_QUIT) {
-				should_quit = true;
-				break;
-			}
-		}
-		if (should_quit) break;
+        while (SDL_PollEvent(&evt) == 1) {
 
+            //handle input:
+            if (evt.type == SDL_KEYDOWN) {
+
+                switch (evt.key.keysym.sym) {
+                case SDLK_LEFT:
+                    if (tile_dir[man_xy.first][man_xy.second].left) {
+                        man_xy.first -= 1;
+                    }
+                    break;
+                case SDLK_RIGHT:
+                    if (tile_dir[man_xy.first][man_xy.second].right) {
+                        man_xy.first += 1;
+                    }
+                    break;
+                case SDLK_UP:
+                    if (tile_dir[man_xy.first][man_xy.second].up) {
+                        man_xy.second -= 1;
+                    }
+                    break;
+                case SDLK_DOWN:
+                    if (tile_dir[man_xy.first][man_xy.second].down) {
+                        man_xy.second += 1;
+                    }
+                    break;
+                case SDLK_SPACE:
+                    for (int i = 0; i < ROCKS; i++) {
+                        if (man_xy == rock_loc[i]) {
+                            rock_mined[i] = true;
+                            found = i == money_tile;
+                        }
+                    }
+                    break;
+                case SDLK_ESCAPE:
+                    should_quit = true;
+                    break;
+                }
+
+            }
+            else if (evt.type == SDL_QUIT) {
+                should_quit = true;
+                break;
+            }
+        }
+
+        if (should_quit) break;
+
+        /*
 		auto current_time = std::chrono::high_resolution_clock::now();
 		static auto previous_time = current_time;
 		float elapsed = std::chrono::duration< float >(current_time - previous_time).count();
 		previous_time = current_time;
+        */
 
-		{ //update game state:
-			(void)elapsed;
-		}
+        { //update game state:
+            map_grid[man_xy.first][man_xy.second] = 1;
+
+            display_text = 0
+
+                for (int i = 0; i < ROCKS; i++) {
+                    if (man_xy == rock_loc[i] && !rock_mined[i]) {
+                        display_text = 1;
+                    }
+                }
+
+            if (found) {
+                display_text = 2;
+            }
+        }
 
 		//draw output:
 		glClearColor(0.5, 0.5, 0.5, 0.0);
@@ -275,10 +478,52 @@ int main(int argc, char **argv) {
 				verts.emplace_back(verts.back());
 			};
 
+            // always draw entire map
+            draw_sprite(map, glm::vec2(0.0f, 0.0f));
+            //  draw sprite player
+            float player_u = ((man_xy.first + 0.5f) / 5) * 1.0f;
+            float player_v = ((man_xy.second + 0.5f) / 7) * 1.0f;
+            draw_sprite(player, glm::vec2((man_xy.first / 5) * 1.0f, ((man_xy.second + 0.5f) / 7) * 1.0f));
+            // always draw money bag           
+            draw_sprite(money_bag, glm::vec2(money_u, money_v));
 
-			//Draw a sprite "player" at position (5.0, 2.0):
-			static SpriteInfo player = load_sprite("player"); //TODO: hoist
-			draw_sprite(player, glm::vec2(5.0, 2.0), 0.2f);
+            // set map to be unveiled at player position, tile not covered if 1
+            for (int i = 0; i < TILE_X; i++) {
+                for (int j = 0; j < TILE_Y; j++) {
+                    if (!map_grid[i][j]) {
+                        int coord_u = ((i + 0.5f) / 5) * 1.0f;
+                        int coord_v = ((j + 0.5f) / 7) * 1.0f;
+                        draw_sprite(black_tile, glm::vec2(coord_u, coord_v));
+                    }
+                }
+            }
+
+            // rock drawned if not mined and unveiled
+            for (int i = 0; i < ROCKS; i++) {
+                if (!rock_mined[i]
+                    && map_grid[rock_loc[i].first][rock_loc[i].second]) {
+                    int coord_u = ((rock_loc[i].first + 0.5f) / 5) * 1.0f;
+                    int coord_v = ((rock_loc[i].second + 0.5f) / 7) * 1.0f;
+                    draw_sprite(rock, glm::vec2(coord_u, coord_v));
+                }
+            }
+
+            // draw display text
+            float display_text_x = 0.5f;
+            float display_text_y = (6.5 / 7) * 1.0f;
+            glm::vec2 display_tex_loc = glm::vec2(display_text_x, display_text_y);
+            switch (display_text) {
+            case 0:
+                draw_sprite(game_start, display_tex_loc);
+                break;
+            case 1:
+                draw_sprite(mine_with_space, display_tex_loc);
+                break;
+            default:
+                draw_sprite(game_end, display_tex_loc);
+                break;
+        }
+
 
 			rect(glm::vec2(0.0f, 0.0f), glm::vec2(4.0f), glm::u8vec4(0xff, 0x00, 0x00, 0xff));
 			rect(mouse * camera.radius + camera.at, glm::vec2(4.0f), glm::u8vec4(0xff, 0xff, 0xff, 0x88));
