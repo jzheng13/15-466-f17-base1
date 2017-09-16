@@ -1,29 +1,26 @@
-NOTE: please fill in the first section with information about your game.
+# Cave Explorer
 
-# *Game Title*
+*Cave Explorer* is *Jia Zheng*'s implementation of [*Cave Explorer*](http://graphics.cs.cmu.edu/courses/15-466-f17/game1-designs/aluo/) for game1 in 15-466-f17.
 
-*Game Title* is *Your Name*'s implementation of [*Design Document*](http://graphics.cs.cmu.edu/courses/15-466-f17/game1-designs/put-real-link-here) for game1 in 15-466-f17.
-
-*Include a Screenshot Here*
-
-## Build Notes
-
-*Include any special notes or steps required to build your game here. If there are no special notes, delete this section.*
+![Game Screenshot](./screenshots/ss1.png)
 
 ## Asset Pipeline
 
-*Briefly describe the asset pipeline for this game. What sorts of source files are used? How are they processed? How are they loaded?*
+The assets for this game were created using [Piskel](http://www.piskelapp.com/), based on the pictures given in the design document. They were then combined into a spritesheet and exported into an image. 
 
 ## Architecture
 
-*Provide a brief introduction to how you implemented the design. Talk about the basic structure of your code.*
+We initialised all tiles in the map and the valid directions that a player can moved when situated on the tiles. The map tiles are mostly are all hardcoded.
+
+The game loop detects keyboard events and react accordingly.
 
 ## Reflection
 
-*Reflect on the assignment. What was difficult? What worked well? If you were doing it again, what would you change?*
+Originally the intention was to extend the design document so that the map can also be generated randomly. To do so, we had to be able to validate the placement of the tiles, as well as ensure that the map spans the entire 6 by 5 grid. This was deem to be too complicated to implement due to time constraints.
 
-*Reflect on the design document. What was clear and what was ambiguous? How did you resolve the ambiguities?*
+Also, the initial implementation was to remove tiles (sprites) but the general implementation draws the sprites every single time the state is updated.
 
+Additionally, in the design document, it was stated that the map was a 6 by 5 grid when it was in fact a 5 by 6 grid. This was slightly confusing when first trying to generate assets for the game as I was unsure of how the map should be dissected.
 
 # About Base1
 
