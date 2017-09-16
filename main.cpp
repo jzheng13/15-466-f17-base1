@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
     };
     */
 
-    SpriteInfo player;
+    SpriteInfo man;
     SpriteInfo map;
     SpriteInfo black_tile;
     SpriteInfo money_bag;
@@ -484,7 +484,7 @@ int main(int argc, char **argv) {
             //  draw sprite player
             float player_u = ((man_xy.first + 0.5f) / 5) * 1.0f;
             float player_v = ((man_xy.second + 0.5f) / 7) * 1.0f;
-            draw_sprite(player, glm::vec2((man_xy.first / 5) * 1.0f, ((man_xy.second + 0.5f) / 7) * 1.0f));
+            draw_sprite(man, glm::vec2((man_xy.first / 5) * 1.0f, ((man_xy.second + 0.5f) / 7) * 1.0f));
             // always draw money bag           
             draw_sprite(money_bag, glm::vec2(money_u, money_v));
 
